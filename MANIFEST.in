@@ -1,0 +1,3 @@
+include versioneer.py
+include pyogas/_version.py
+include LICENSE
