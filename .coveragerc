@@ -1,0 +1,9 @@
+[run]
+source = pyogas
+omit =
+    # Omit test, docs, draft and data files
+    test/*
+    docs/*
+
+    # Ignore _version.py
+    */_version.py
