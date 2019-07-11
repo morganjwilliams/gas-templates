@@ -1,11 +1,7 @@
 """
-Minor utilities for working with Iogas templates.
+A module for writing new Iogas XML templates (e.g. from matplotlib).
 """
 import logging
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 logger = logging.getLogger(__name__)
-
-from . import xml
-
-__all__ = ["xml"]
