@@ -1,26 +1,39 @@
 import sys
-from xml.etree.ElementTree import Element
-from lxml.etree import Element
+from matplotlib.colors import to_rgba
+from lxml.etree import Element as lxElement
 import logging
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 logger = logging.getLogger(__name__)
 
 
-def IGElement(tag, *args, **kwargs):
+def Element(tag, *args, **kwargs):
     """
     Return an xml element which should preserve attribute order.
     """
     cfg = {k: str(v) for k, v in kwargs.items() if v is not None}
-    E = Element(tag, *args)
+    E = lxElement(tag, *args)
     for k, v in cfg.items():
         E.set(k, v)
     return E
 
 
-def get_color(color):
-    r, g, b, a = [str(i) for i in color]
-    return IGElement("Colour", r=r, g=g, b=b)
+def get_color(c):
+    """
+    Get a color element from a RGBA tuple.
+
+    Parameters
+    ------------
+    color : :class:`tuple` | :class:`str`
+
+    Returns
+    ----------
+    :class:`lxml.etree.Element`
+    """
+    if isinstance(c, str):
+        c = to_rgba("K")
+    r, g, b, a = [str(i) for i in c]
+    return Element("Colour", r=r, g=g, b=b)
 
 
 def Variable(component, letter, unit=None):
@@ -36,10 +49,10 @@ def Variable(component, letter, unit=None):
 
     Returns
     ---------
-    :class:`xml.etree.ElementTree.Element`
+    :class:`lxml.etree.Element`
     """
     cfg = dict(letter=letter, element=component, unit=unit)
-    return IGElement("Variable", **{k: str(v) for k, v in cfg.items() if v is not None})
+    return Element("Variable", **{k: str(v) for k, v in cfg.items() if v is not None})
 
 
 def FreeVariable(name, letter):
@@ -53,9 +66,9 @@ def FreeVariable(name, letter):
 
     Returns
     ---------
-    :class:`xml.etree.ElementTree.Element`
+    :class:`lxml.etree.Element`
     """
-    return IGElement("FreeVariable", letter="A", columnName=name)
+    return Element("FreeVariable", letter="A", columnName=name)
 
 
 def Bounds(x, y, width=1.0, height=1.0):
@@ -64,9 +77,9 @@ def Bounds(x, y, width=1.0, height=1.0):
 
     Returns
     ---------
-    :class:`xml.etree.ElementTree.Element`
+    :class:`lxml.etree.Element`
     """
-    return IGElement(
+    return Element(
         "Bounds",
         x="{:.5f}".format(x),
         y="{:.5f}".format(y),
@@ -76,20 +89,35 @@ def Bounds(x, y, width=1.0, height=1.0):
 
 
 def Comment(text):
-    c = IGElement("Comment")
+    """
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
+    """
+    c = Element("Comment")
     c.text = text
     return c
 
 
 def Reference(text):
-    r = IGElement("Reference")
+    """
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
+    """
+    r = Element("Reference")
     r.text = text
     return r
 
 
 def Label(name, xy=(0, 0), color=None, labelangle=0.0, visible=True, strfmt="{:.5f}"):
+    """
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
+    """
     x, y = xy
-    label = IGElement(
+    label = Element(
         "Label",
         name=name,
         visible=str(visible).lower(),
@@ -98,7 +126,7 @@ def Label(name, xy=(0, 0), color=None, labelangle=0.0, visible=True, strfmt="{:.
     )
     if color is not None:
         label.append(get_color(color))
-    label.append(IGElement("LabelAngle", angle=str(labelangle)))
+    label.append(Element("LabelAngle", angle=str(labelangle)))
     return label
 
 
@@ -111,8 +139,13 @@ def PointFeature(
     visible=True,
     strfmt="{:.5f}",
 ):
+    """
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
+    """
     x, y = xy
-    pf = IGElement(
+    pf = Element(
         "PointFeature",
         name=str(name),
         visible=str(visible).lower(),
@@ -122,18 +155,22 @@ def PointFeature(
     )
     if color is not None:
         pf.append(get_color(color))
-    pf.append(IGElement("LabelAngle", angle=str(labelangle)))
+    pf.append(Element("LabelAngle", angle=str(labelangle)))
     return pf
 
 
 def Polygon(xpoints, ypoints, name="", visible=True, strfmt="{:.5f}"):
     """
     Polygon defined by point verticies.
+
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
     """
-    polygon = IGElement("Polygon", name=str(name), visible=str(visible).lower())
+    polygon = Element("Polygon", name=str(name), visible=str(visible).lower())
     polygon.extend(
         [
-            IGElement("Point", x=strfmt.format(x), y=strfmt.format(y))
+            Element("Point", x=strfmt.format(x), y=strfmt.format(y))
             for x, y in zip(xpoints, ypoints)
         ]
     )
@@ -143,11 +180,15 @@ def Polygon(xpoints, ypoints, name="", visible=True, strfmt="{:.5f}"):
 def Boundary(xpoints, ypoints):
     """
     Boundary polygon defined by point verticies.
+
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
     """
-    boundary = IGElement("Boundary")
+    boundary = Element("Boundary")
     boundary.extend(
         [
-            IGElement("Point", x="{:.5f}".format(x), y="{:.5f}".format(y))
+            Element("Point", x="{:.5f}".format(x), y="{:.5f}".format(y))
             for (x, y) in zip(xpoints, ypoints)
         ]
     )
@@ -171,8 +212,12 @@ def BiezerPoint(x, y, sectionEnd=False, strfmt="{:.5f}"):
     ------
 
         * Line segments which have only two points have <sectionEnd="true>
+
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
     """
-    return IGElement(
+    return Element(
         "BezierPoint",
         x=strfmt.format(x),
         y=strfmt.format(y),
@@ -189,10 +234,12 @@ def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.5f}"):
     xpoints, ypoints : :class:`numpy.ndarray`
         Location of the control points.
 
-
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
     """
-    boundary3 = IGElement("Boundary3")
-    segs = [IGElement("Linear") for (x, y) in zip(xpoints, ypoints)]
+    boundary3 = Element("Boundary3")
+    segs = [Element("Linear") for (x, y) in zip(xpoints, ypoints)]
     for ix, s in enumerate(segs):
         s.append(BiezerPoint(xpoints[ix], ypoints[ix], strfmt=strfmt))
     boundary3.extend(segs)
@@ -210,7 +257,12 @@ def Poly(
     endArrow=False,
     strfmt="{:.5f}",
 ):
-    poly = IGElement(
+    """
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
+    """
+    poly = Element(
         "Poly",
         name=name,
         visible=str(visible).lower(),
@@ -219,20 +271,25 @@ def Poly(
     )
     if color is not None:
         poly.append(get_color(color))
-    poly.append(IGElement("LabelAngle", angle=str(labelangle)))
+    poly.append(Element("LabelAngle", angle=str(labelangle)))
     lx, ly = labelpos
-    poly.append(IGElement("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
+    poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
     poly.append(boundary3)
     return poly
 
 
 def RegionPolygon(boundary, name="", color=None, description=None):
-    c = IGElement("RegionPolygon", name=name, visible="true")
+    """
+    Returns
+    ---------
+    :class:`lxml.etree.Element`
+    """
+    c = Element("RegionPolygon", name=name, visible="true")
     sub = []
     if color is not None:
         sub.append(get_color(color))
     if description is not None:
-        sub.append(IGElement("Description", name=description))
+        sub.append(Element("Description", name=description))
     sub.append(boundary)
     c.extend(sub)
     return c

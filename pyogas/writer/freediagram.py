@@ -7,15 +7,15 @@ logger = logging.getLogger(__name__)
 
 
 def FreeFunctionAxisX(name, function):
-    return IGElement("FreeFunctionAxisX", name=name, function=function)
+    return Element("FreeFunctionAxisX", name=name, function=function)
 
 
 def FreeFunctionAxisY(name, function):
-    return IGElement("FreeFunctionAxisY", name=name, function=function)
+    return Element("FreeFunctionAxisY", name=name, function=function)
 
 
 def FreeXYDiagram(xvar, yvar, logx=False, logy=False):
-    diagram = IGElement("FreeXYDiagram", name="XY Diagram")
+    diagram = Element("FreeXYDiagram", name="XY Diagram")
     diagram.extend(
         [
             FreeFunctionAxisX(xvar, ["A", "log(A)"][logx]),

@@ -27,13 +27,13 @@ def default_units(var):
 
 
 def GeochemFunctionAxisX(name, function, log=False):
-    return IGElement(
+    return Element(
         "GeochemFunctionAxisX", name=str(name), function=function, log=str(log).lower()
     )
 
 
 def GeochemFunctionAxisY(name, function, log=False):
-    return IGElement(
+    return Element(
         "GeochemFunctionAxisY", name=str(name), function=function, log=str(log).lower()
     )
 
@@ -47,7 +47,7 @@ def GeochemXYDiagram(
 
         * split ratios to determine true variables and functions, and their units
     """
-    diagram = IGElement("XYDiagram", name="{} vs. {}".format(yvar, xvar))
+    diagram = Element("XYDiagram", name="{} vs. {}".format(yvar, xvar))
     vars = []
     for v in [xvar, yvar]:
         if "/" in v:
