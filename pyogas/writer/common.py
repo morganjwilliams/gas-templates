@@ -1,14 +1,26 @@
 import sys
 from xml.etree.ElementTree import Element
+from lxml.etree import Element
 import logging
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 logger = logging.getLogger(__name__)
 
 
+def IGElement(tag, *args, **kwargs):
+    """
+    Return an xml element which should preserve attribute order.
+    """
+    cfg = {k: str(v) for k, v in kwargs.items() if v is not None}
+    E = Element(tag, *args)
+    for k, v in cfg.items():
+        E.set(k, v)
+    return E
+
+
 def get_color(color):
     r, g, b, a = [str(i) for i in color]
-    return Element("Color", r=r, g=g, b=b)
+    return IGElement("Colour", r=r, g=g, b=b)
 
 
 def Variable(component, letter, unit=None):
@@ -27,7 +39,7 @@ def Variable(component, letter, unit=None):
     :class:`xml.etree.ElementTree.Element`
     """
     cfg = dict(letter=letter, element=component, unit=unit)
-    return Element("Variable", **{k: str(v) for k, v in cfg.items() if v is not None})
+    return IGElement("Variable", **{k: str(v) for k, v in cfg.items() if v is not None})
 
 
 def FreeVariable(name, letter):
@@ -43,7 +55,7 @@ def FreeVariable(name, letter):
     ---------
     :class:`xml.etree.ElementTree.Element`
     """
-    return Element("FreeVariable", letter="A", columnName=name)
+    return IGElement("FreeVariable", letter="A", columnName=name)
 
 
 def Bounds(x, y, width=1.0, height=1.0):
@@ -54,7 +66,7 @@ def Bounds(x, y, width=1.0, height=1.0):
     ---------
     :class:`xml.etree.ElementTree.Element`
     """
-    return Element(
+    return IGElement(
         "Bounds",
         x="{:.5f}".format(x),
         y="{:.5f}".format(y),
@@ -64,20 +76,20 @@ def Bounds(x, y, width=1.0, height=1.0):
 
 
 def Comment(text):
-    c = Element("Comment")
+    c = IGElement("Comment")
     c.text = text
     return c
 
 
 def Reference(text):
-    r = Element("Reference")
+    r = IGElement("Reference")
     r.text = text
     return r
 
 
 def Label(name, xy=(0, 0), color=None, labelangle=0.0, visible=True, strfmt="{:.5f}"):
     x, y = xy
-    label = Element(
+    label = IGElement(
         "Label",
         name=name,
         visible=str(visible).lower(),
@@ -86,7 +98,7 @@ def Label(name, xy=(0, 0), color=None, labelangle=0.0, visible=True, strfmt="{:.
     )
     if color is not None:
         label.append(get_color(color))
-    label.append(Element("LabelAngle", angle=str(labelangle)))
+    label.append(IGElement("LabelAngle", angle=str(labelangle)))
     return label
 
 
@@ -100,7 +112,7 @@ def PointFeature(
     strfmt="{:.5f}",
 ):
     x, y = xy
-    pf = Element(
+    pf = IGElement(
         "PointFeature",
         name=str(name),
         visible=str(visible).lower(),
@@ -110,7 +122,7 @@ def PointFeature(
     )
     if color is not None:
         pf.append(get_color(color))
-    pf.append(Element("LabelAngle", angle=str(labelangle)))
+    pf.append(IGElement("LabelAngle", angle=str(labelangle)))
     return pf
 
 
@@ -118,10 +130,10 @@ def Polygon(xpoints, ypoints, name="", visible=True, strfmt="{:.5f}"):
     """
     Polygon defined by point verticies.
     """
-    polygon = Element("Polygon", name=str(name), visible=str(visible).lower())
+    polygon = IGElement("Polygon", name=str(name), visible=str(visible).lower())
     polygon.extend(
         [
-            Element("Point", x=strfmt.format(x), y=strfmt.format(y))
+            IGElement("Point", x=strfmt.format(x), y=strfmt.format(y))
             for x, y in zip(xpoints, ypoints)
         ]
     )
@@ -132,10 +144,10 @@ def Boundary(xpoints, ypoints):
     """
     Boundary polygon defined by point verticies.
     """
-    boundary = Element("Boundary")
+    boundary = IGElement("Boundary")
     boundary.extend(
         [
-            Element("Point", x="{:.5f}".format(x), y="{:.5f}".format(y))
+            IGElement("Point", x="{:.5f}".format(x), y="{:.5f}".format(y))
             for (x, y) in zip(xpoints, ypoints)
         ]
     )
@@ -160,7 +172,7 @@ def BiezerPoint(x, y, sectionEnd=False, strfmt="{:.5f}"):
 
         * Line segments which have only two points have <sectionEnd="true>
     """
-    return Element(
+    return IGElement(
         "BezierPoint",
         x=strfmt.format(x),
         y=strfmt.format(y),
@@ -179,8 +191,8 @@ def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.5f}"):
 
 
     """
-    boundary3 = Element("Boundary3")
-    segs = [Element("Linear") for (x, y) in zip(xpoints, ypoints)]
+    boundary3 = IGElement("Boundary3")
+    segs = [IGElement("Linear") for (x, y) in zip(xpoints, ypoints)]
     for ix, s in enumerate(segs):
         s.append(BiezerPoint(xpoints[ix], ypoints[ix], strfmt=strfmt))
     boundary3.extend(segs)
@@ -198,7 +210,7 @@ def Poly(
     endArrow=False,
     strfmt="{:.5f}",
 ):
-    poly = Element(
+    poly = IGElement(
         "Poly",
         name=name,
         visible=str(visible).lower(),
@@ -207,20 +219,20 @@ def Poly(
     )
     if color is not None:
         poly.append(get_color(color))
-    poly.append(Element("LabelAngle", angle=str(labelangle)))
+    poly.append(IGElement("LabelAngle", angle=str(labelangle)))
     lx, ly = labelpos
-    poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
+    poly.append(IGElement("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
     poly.append(boundary3)
     return poly
 
 
 def RegionPolygon(boundary, name="", color=None, description=None):
-    c = Element("RegionPolygon", name=name, visible="true")
+    c = IGElement("RegionPolygon", name=name, visible="true")
     sub = []
     if color is not None:
         sub.append(get_color(color))
     if description is not None:
-        sub.append(Element("Description", name=description))
+        sub.append(IGElement("Description", name=description))
     sub.append(boundary)
     c.extend(sub)
     return c

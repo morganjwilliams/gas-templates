@@ -1,4 +1,3 @@
-from xml.etree.ElementTree import Element
 from pyrolite.geochem.ind import common_elements, common_oxides
 from .common import *
 
@@ -28,13 +27,13 @@ def default_units(var):
 
 
 def GeochemFunctionAxisX(name, function, log=False):
-    return Element(
+    return IGElement(
         "GeochemFunctionAxisX", name=str(name), function=function, log=str(log).lower()
     )
 
 
 def GeochemFunctionAxisY(name, function, log=False):
-    return Element(
+    return IGElement(
         "GeochemFunctionAxisY", name=str(name), function=function, log=str(log).lower()
     )
 
@@ -48,7 +47,7 @@ def GeochemXYDiagram(
 
         * split ratios to determine true variables and functions, and their units
     """
-    diagram = Element("XYDiagram", name="{} vs. {}".format(yvar, xvar))
+    diagram = IGElement("XYDiagram", name="{} vs. {}".format(yvar, xvar))
     vars = []
     for v in [xvar, yvar]:
         if "/" in v:
