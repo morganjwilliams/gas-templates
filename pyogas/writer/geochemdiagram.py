@@ -38,8 +38,16 @@ def GeochemFunctionAxisY(name, function, log=False):
     )
 
 
-def GeochemXYDiagram(
-    xvar, yvar, logx=False, logy=False, bounds=None, comments=[], references=[]
+def XYDiagram(
+    xvar,
+    yvar,
+    logscalex=False,
+    logscaley=False,
+    logxdata=False,
+    logydata=False,
+    bounds=None,
+    comments=[],
+    references=[],
 ):
     """
     Todo
@@ -69,10 +77,14 @@ def GeochemXYDiagram(
     diagram.extend(
         [
             GeochemFunctionAxisX(
-                ["{}", "log({})"][logx].format(xvar), ["{}", "log({})"][logx].format(xf)
+                ["{}", "log({})"][logxdata].format(xvar),
+                ["{}", "log({})"][logxdata].format(xf),
+                log=logscalex,
             ),
             GeochemFunctionAxisY(
-                ["{}", "log({})"][logy].format(yvar), ["{}", "log({})"][logy].format(yf)
+                ["{}", "log({})"][logydata].format(yvar),
+                ["{}", "log({})"][logydata].format(yf),
+                log=logscaley,
             ),
         ]
     )

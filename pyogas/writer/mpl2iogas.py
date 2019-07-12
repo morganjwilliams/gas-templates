@@ -12,13 +12,21 @@ from . import freediagram
 from . import geochemdiagram
 from . import freeternary
 
+from pyrolite.geochem.ind import common_elements, common_oxides
+
+__els__ = common_elements(as_set=True)
+__ox__ = common_oxides(as_set=True)
+__chem__ = __els__ | __ox__
+
 
 def contours_to_FreeXYDiagram(
     ax,
     xvar="X",
     yvar="Y",
-    logx=False,
-    logy=False,
+    logscalex=False,
+    logscaley=False,
+    logxdata=False,
+    logydata=False,
     filename="element.xml",
     contournames=None,
     resolution=100,
@@ -38,7 +46,14 @@ def contours_to_FreeXYDiagram(
         The polygons need not return to the same point.
     """
     filename = str(filename)
-    diagram = freediagram.FreeXYDiagram(xvar, yvar, logx=logx, logy=logy)
+    diagram = freediagram.XYDiagram(
+        xvar,
+        yvar,
+        logscalex=logscalex,
+        logscaley=logscaley,
+        logxdata=logxdata,
+        logydata=logydata,
+    )
     cpaths, cnames, styles = get_contour_paths(ax, resolution=resolution)
     if contournames is not None:
         assert len(contournames) == len(cpaths)
@@ -47,6 +62,10 @@ def contours_to_FreeXYDiagram(
     contours = []
     for ix, (p, name, sty) in enumerate(zip(cpaths, cnames, styles)):
         for six, subpath in enumerate(p):
+            if logxdata:
+                subpath[0] = np.log(subpath[0])
+            if logydata:
+                subpath[1] = np.log(subpath[1])
             if len(p) != 1:
                 suffix = "-" + int_to_alpha(six)
             else:
@@ -78,8 +97,10 @@ def contours_to_GeochemXYDiagram(
     ax,
     xvar="X",
     yvar="Y",
-    logx=False,
-    logy=False,
+    logscalex=False,
+    logscaley=False,
+    logxdata=False,
+    logydata=False,
     filename="element.xml",
     contournames=None,
     resolution=100,
@@ -97,9 +118,24 @@ def contours_to_GeochemXYDiagram(
     ------
 
         The polygons need not return to the same point.
+
+        If the diagram is for log, the coordinates need to be log.
     """
     filename = str(filename)
-    diagram = geochemdiagram.GeochemXYDiagram(xvar, yvar, logx=logx, logy=logy)
+    if all([i in __chem__ for i in xvar.split("/")]) and all(
+        [i in __chem__ for i in yvar.split("/")]
+    ):
+        dg = geochemdiagram.XYDiagram
+    else:
+        dg = freediagram.XYDiagram
+    diagram = dg(
+        xvar,
+        yvar,
+        logscalex=logscalex,
+        logscaley=logscaley,
+        logxdata=logxdata,
+        logydata=logydata,
+    )
     cpaths, cnames, styles = get_contour_paths(ax, resolution=resolution)
     if contournames is not None:
         assert len(contournames) == len(cpaths)
@@ -108,6 +144,10 @@ def contours_to_GeochemXYDiagram(
     contours = []
     for ix, (p, name, sty) in enumerate(zip(cpaths, cnames, styles)):
         for six, subpath in enumerate(p):
+            if logxdata:
+                subpath[0] = np.log(subpath[0])
+            if logydata:
+                subpath[1] = np.log(subpath[1])
             if len(p) != 1:
                 suffix = "-" + int_to_alpha(six)
             else:
