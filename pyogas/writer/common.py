@@ -68,7 +68,7 @@ def FreeVariable(name, letter):
     ---------
     :class:`lxml.etree.Element`
     """
-    return Element("FreeVariable", letter="A", columnName=name)
+    return Element("FreeVariable", letter=letter, columnName=name)
 
 
 def Bounds(x, y, width=1.0, height=1.0):
