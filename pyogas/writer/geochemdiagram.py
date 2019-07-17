@@ -1,4 +1,5 @@
 from pyrolite.geochem.ind import common_elements, common_oxides
+from pyrolite.util.text import int_to_alpha
 from .common import *
 
 __els__ = common_elements(as_set=True)
@@ -67,7 +68,7 @@ def XYDiagram(
         diagram.set("variateMode", "Multi")
     info = {
         v: {"code": l, "unit": default_units(v)}
-        for v, l in zip(vars, ["A", "B", "C", "D"])
+        for v, l in zip(vars, [int_to_alpha(ix).upper() for ix in range(len(vars))])
     }
     xf, yf = xvar, yvar
     for v, d in info.items():
