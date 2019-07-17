@@ -110,7 +110,7 @@ def Reference(text):
     return r
 
 
-def Label(name, xy=(0, 0), color=None, labelangle=0.0, visible=True, strfmt="{:.7f}"):
+def Label(name, xy=(0, 0), color=None, labelangle=0.0, visible=True, strfmt="{:.5f}"):
     """
     Returns
     ---------
@@ -159,7 +159,7 @@ def PointFeature(
     return pf
 
 
-def Polygon(xpoints, ypoints, name="", visible=True, strfmt="{:.7f}"):
+def Polygon(xpoints, ypoints, name="", visible=True, strfmt="{:.5f}"):
     """
     Polygon defined by point verticies.
 
@@ -195,7 +195,7 @@ def Boundary(xpoints, ypoints):
     return boundary
 
 
-def BiezerPoint(x, y, sectionEnd=False, strfmt="{:.7f}"):
+def BiezerPoint(x, y, sectionEnd=False, strfmt="{:.5f}"):
     """
     Biezer Curve Control point.
 
@@ -225,7 +225,7 @@ def BiezerPoint(x, y, sectionEnd=False, strfmt="{:.7f}"):
     )
 
 
-def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.7f}"):
+def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.5f}"):
     """
     Boundary defined by segments.
 
