@@ -1,7 +1,7 @@
 from .common import *
 
 
-def TPoint(a, b, c=None, strfmt="{:.5f}"):
+def TPoint(a, b, c=None, strfmt="{:.7f}"):
     """
     Ternary point defined by a and b axes.
     """
