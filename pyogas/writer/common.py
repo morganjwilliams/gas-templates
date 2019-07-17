@@ -247,15 +247,17 @@ def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.5f}"):
 
 
 def Poly(
-    name,
-    boundary3,
+    path,
+    name="Poly",
     labelpos=(41.465637, -7.38374),
     labelangle=0.0,
     color=None,
     closed=True,
     visible=True,
     endArrow=False,
+    description=None,  # has no effect for Poly here
     strfmt="{:.5f}",
+    pathcls=Boundary3, # class of boundary
 ):
     """
     Returns
@@ -274,11 +276,11 @@ def Poly(
     poly.append(Element("LabelAngle", angle=str(labelangle)))
     lx, ly = labelpos
     poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
-    poly.append(boundary3)
+    poly.append(pathcls(*path))
     return poly
 
 
-def RegionPolygon(boundary, name="", color=None, description=None):
+def RegionPolygon(path, name="", color=None, description=None, pathcls=Boundary):
     """
     Returns
     ---------
@@ -290,6 +292,6 @@ def RegionPolygon(boundary, name="", color=None, description=None):
         sub.append(get_color(color))
     if description is not None:
         sub.append(Element("Description", name=description))
-    sub.append(boundary)
+    sub.append(pathcls(*path))
     c.extend(sub)
     return c
