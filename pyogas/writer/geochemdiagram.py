@@ -1,4 +1,5 @@
 from pyrolite.geochem.ind import common_elements, common_oxides
+from pyrolite.util.text import int_to_alpha
 from .common import *
 
 __els__ = common_elements(as_set=True)
@@ -27,19 +28,27 @@ def default_units(var):
 
 
 def GeochemFunctionAxisX(name, function, log=False):
-    return IGElement(
+    return Element(
         "GeochemFunctionAxisX", name=str(name), function=function, log=str(log).lower()
     )
 
 
 def GeochemFunctionAxisY(name, function, log=False):
-    return IGElement(
+    return Element(
         "GeochemFunctionAxisY", name=str(name), function=function, log=str(log).lower()
     )
 
 
-def GeochemXYDiagram(
-    xvar, yvar, logx=False, logy=False, bounds=None, comments=[], references=[]
+def XYDiagram(
+    xvar,
+    yvar,
+    logscalex=False,
+    logscaley=False,
+    logxdata=False,
+    logydata=False,
+    bounds=None,
+    comments=[],
+    references=[],
 ):
     """
     Todo
@@ -47,7 +56,7 @@ def GeochemXYDiagram(
 
         * split ratios to determine true variables and functions, and their units
     """
-    diagram = IGElement("XYDiagram", name="{} vs. {}".format(yvar, xvar))
+    diagram = Element("XYDiagram", name="{} vs. {}".format(yvar, xvar))
     vars = []
     for v in [xvar, yvar]:
         if "/" in v:
@@ -59,7 +68,7 @@ def GeochemXYDiagram(
         diagram.set("variateMode", "Multi")
     info = {
         v: {"code": l, "unit": default_units(v)}
-        for v, l in zip(vars, ["A", "B", "C", "D"])
+        for v, l in zip(vars, [int_to_alpha(ix).upper() for ix in range(len(vars))])
     }
     xf, yf = xvar, yvar
     for v, d in info.items():
@@ -69,10 +78,14 @@ def GeochemXYDiagram(
     diagram.extend(
         [
             GeochemFunctionAxisX(
-                ["{}", "log({})"][logx].format(xvar), ["{}", "log({})"][logx].format(xf)
+                ["{}", "log({})"][logxdata].format(xvar),
+                ["{}", "log({})"][logxdata].format(xf),
+                log=logscalex,
             ),
             GeochemFunctionAxisY(
-                ["{}", "log({})"][logy].format(yvar), ["{}", "log({})"][logy].format(yf)
+                ["{}", "log({})"][logydata].format(yvar),
+                ["{}", "log({})"][logydata].format(yf),
+                log=logscaley,
             ),
         ]
     )

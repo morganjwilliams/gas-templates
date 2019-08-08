@@ -5,23 +5,23 @@ def TPoint(a, b, c=None, strfmt="{:.5f}"):
     """
     Ternary point defined by a and b axes.
     """
-    return IGElement("TPoint", a=strfmt.format(a), b=strfmt.format(b))
+    return Element("TPoint", a=strfmt.format(a), b=strfmt.format(b))
 
 
 def FreeAxisA(name, log=False):
-    return IGElement("FreeAxisA", name=str(name), log=str(log).lower())
+    return Element("FreeAxisA", name=str(name), log=str(log).lower())
 
 
 def FreeAxisB(name, log=False):
-    return IGElement("FreeAxisB", name=str(name), log=str(log).lower())
+    return Element("FreeAxisB", name=str(name), log=str(log).lower())
 
 
 def FreeAxisC(name, log=False):
-    return IGElement("FreeAxisC", name=str(name), log=str(log).lower())
+    return Element("FreeAxisC", name=str(name), log=str(log).lower())
 
 
 def FreeTernaryDiagram(name, avar, bvar, cvar, bounds=None, comments=[], references=[]):
-    diagram = IGElement(
+    diagram = Element(
         "FreeTernaryDiagram", name="{} - {} - {}".format(avar, bvar, cvar)
     )
     diagram.extend([FreeAxisA(avar), FreeAxisB(bvar), FreeAxisC(cvar)])
