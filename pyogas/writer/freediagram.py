@@ -2,6 +2,7 @@ import sys
 from .common import *
 from pyrolite.util.text import int_to_alpha
 import logging
+import re
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 logger = logging.getLogger(__name__)
@@ -36,6 +37,7 @@ def XYDiagram(
     logydata=False,
     bounds=None,
     allow_free_func=False,
+    delim=r"[/+*-]",
     comments=[],
     references=[],
 ):
@@ -44,8 +46,8 @@ def XYDiagram(
     if allow_free_func:
         dvars, vars = [], []
         for v in [xvar, yvar]:
-            if "/" in v:
-                vars += v.split("/")
+            if re.findall(delim, v):
+                vars += [i for i in re.split(delim, v) if not i.isnumeric()]
             else:
                 vars.append(v)
         vars = set(vars)

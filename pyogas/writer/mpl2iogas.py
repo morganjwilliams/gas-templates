@@ -111,5 +111,57 @@ def contours_to_XYDiagram(
     return prettify_xml(diagram)
 
 
-def contours_to_FreeTernaryDiagram():
-    pass
+def contours_to_FreeTernaryDiagram(
+    ax,
+    tvar="A",
+    lvar="B",
+    rvar="C",
+    filename="element.xml",
+    contournames=None,
+    resolution=100,
+    description_prefix="",
+    encoding="utf-8",
+    allow_free_func=True,
+):
+    filename = str(filename)
+
+    poly = RegionPolygon
+    diagram = freeternary.FreeTernaryDiagram(
+        tvar,
+        lvar,
+        rvar,
+        bounds=None,
+        comments=[],
+        references=[],
+        allow_free_func=allow_free_func,
+    )
+
+    cpaths, cnames, styles = get_contour_paths(ax, resolution=resolution)
+    if contournames is not None:
+        assert len(contournames) == len(cpaths)
+        cnames = contournames
+    # create contours
+    contours = []
+    for ix, (p, name, sty) in enumerate(zip(cpaths, cnames, styles)):
+        for six, subpath in enumerate(p):
+            if len(p) != 1:
+                suffix = "-" + int_to_alpha(six)
+            else:
+                suffix = ""
+            cname = ["Countour-{}".format(name), "Countour-{}".format(ix)][
+                name is None
+            ] + suffix
+            # might need to transform subpath here
+            axis_to_data = ax.transData + ax.transTernaryAxes.inverted()
+            subpath = axis_to_data.transform(subpath.T)
+            c = poly(
+                subpath,
+                color=sty["color"],
+                name=str(name),
+                description=description_prefix,
+                mode="ternary",
+            )
+            contours.append(c)
+    diagram.extend(contours)
+    ElementTree(diagram).write(filename, method="xml", encoding=encoding)
+    return prettify_xml(diagram)

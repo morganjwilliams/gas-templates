@@ -177,7 +177,7 @@ def Polygon(xpoints, ypoints, name="", visible=True, strfmt="{:.5f}"):
     return polygon
 
 
-def Boundary(xpoints, ypoints):
+def Boundary(coords, mode=None):
     """
     Boundary polygon defined by point verticies.
 
@@ -186,12 +186,24 @@ def Boundary(xpoints, ypoints):
     :class:`lxml.etree.Element`
     """
     boundary = Element("Boundary")
-    boundary.extend(
-        [
-            Element("Point", x="{:.5f}".format(x), y="{:.5f}".format(y))
-            for (x, y) in zip(xpoints, ypoints)
-        ]
-    )
+    if mode is None:
+        xcoords, ycoords = coords
+        boundary.extend(
+            [
+                Element("Point", x="{:.5f}".format(x), y="{:.5f}".format(y))
+                for (x, y) in zip(xcoords, ycoords)
+            ]
+        )
+    elif mode == "ternary":
+        t, l, r = coords.T
+        boundary.extend(
+            [
+                Element("TPoint", a="{:.5f}".format(x), b="{:.5f}".format(y))
+                for (x, y) in zip(t, l)
+            ]
+        )
+    else:
+        return NotImplementedError
     return boundary
 
 
@@ -257,7 +269,7 @@ def Poly(
     endArrow=False,
     description=None,  # has no effect for Poly here
     strfmt="{:.5f}",
-    pathcls=Boundary3, # class of boundary
+    pathcls=Boundary3,  # class of boundary
 ):
     """
     Returns
@@ -276,11 +288,13 @@ def Poly(
     poly.append(Element("LabelAngle", angle=str(labelangle)))
     lx, ly = labelpos
     poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
-    poly.append(pathcls(*path))
+    poly.append(pathcls(path))
     return poly
 
 
-def RegionPolygon(path, name="", color=None, description=None, pathcls=Boundary):
+def RegionPolygon(
+    path, name="", color=None, description=None, pathcls=Boundary, mode=None
+):
     """
     Returns
     ---------
@@ -292,6 +306,6 @@ def RegionPolygon(path, name="", color=None, description=None, pathcls=Boundary)
         sub.append(get_color(color))
     if description is not None:
         sub.append(Element("Description", name=description))
-    sub.append(pathcls(*path))
+    sub.append(pathcls(path, mode=mode))
     c.extend(sub)
     return c
