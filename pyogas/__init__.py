@@ -14,4 +14,4 @@ from .writer.mpl2iogas import contours_to_XYDiagram, contours_to_FreeTernaryDiag
 __version__ = get_versions()["version"]
 del get_versions
 
-__all__ = ["contours_to_XYDiagram"]
+__all__ = ["contours_to_XYDiagram", "contours_to_FreeTernaryDiagram"]

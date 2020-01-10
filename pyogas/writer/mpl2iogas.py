@@ -28,24 +28,56 @@ def contours_to_XYDiagram(
     logscaley=False,
     logxdata=False,
     logydata=False,
-    filename="element.xml",
-    contournames=None,
-    allow_free_func=True,
     resolution=100,
+    contournames=None,
+    filename="element.xml",
+    allow_free_func=True,
     description_prefix="",
     encoding="utf-8",
 ):
     """
-    Take the contour lines from an axis and convert them to an iogas xml diagram
-    template.
+    Take the contour lines from a bivariate axis and convert them to an
+    IoGas(TM) xml diagram template.
 
     Parameters
     ------------
+    ax : :class:`matplotlib.axes.Axes`
+        Axes to take contours from.
+    xvar : :class:`str`
+        X-axis variable name.
+    yvar : :class:`str`
+        Y-axis variable name.
+    logscalex : :class:`bool`
+        Whether to render the diagram with a log-scaled x axis.
+    logscaley : :class:`bool`
+        Whether to render the diagram with a log-scaled y axis.
+    logxdata : :class:`bool`
+        Whether to log-transform the x coordinates (such that the x variable is
+        effectively log(x)).
+    logydata : :class:`bool`
+        Whether to log-transform the y coordinates (such that the y variable is
+        effectively log(y)).
+    resolution : :class:`int`
+        Resolution of the output contours, which directly controls the number of
+        interpolated points.
+    contournames : :class:`list`
+        Names/labels for contours, optional.
+    filename : :class:`str` | :class:`pathlib.Path`
+        Filename for output xml diagram.
+    allow_free_func : :class:`bool
+        Whether to allow free-function axes in the xml template.
+    description_prefix : :class:`str`
+        Prefix for the diagram description.
+    encoding : :class:`str`
+        Encoding for the output file, defaults to UTF-8 unicode.
+
+    Returns
+    ---------
+    :class:`str`
+        String-formatted xml template file, output for purposes of quick checking.
 
     Note
     ------
-
-        The polygons need not return to the same point.
 
         If the diagram is for log, the coordinates need to be log.
     """
@@ -116,13 +148,46 @@ def contours_to_FreeTernaryDiagram(
     tvar="A",
     lvar="B",
     rvar="C",
-    filename="element.xml",
-    contournames=None,
     resolution=100,
+    contournames=None,
+    filename="element.xml",
+    allow_free_func=True,
     description_prefix="",
     encoding="utf-8",
-    allow_free_func=True,
 ):
+    """
+    Take the contour lines from a ternary axis and convert them to an
+    IoGas(TM) xml diagram template.
+
+    Parameters
+    ------------
+    ax : :class:`matplotlib.axes.Axes`
+        Axes to take contours from.
+    tvar : :class:`str`
+        Top-axis variable name.
+    lvar : :class:`str`
+        Left-axis variable name.
+    rvar : :class:`str`
+        Right-axis variable name.
+    resolution : :class:`int`
+        Resolution of the output contours, which directly controls the number of
+        interpolated points.
+    contournames : :class:`list`
+        Names/labels for contours, optional.
+    filename : :class:`str` | :class:`pathlib.Path`
+        Filename for output xml diagram.
+    allow_free_func : :class:`bool
+        Whether to allow free-function axes in the xml template.
+    description_prefix : :class:`str`
+        Prefix for the diagram description.
+    encoding : :class:`str`
+        Encoding for the output file, defaults to UTF-8 unicode.
+
+    Returns
+    ---------
+    :class:`str`
+        String-formatted xml template file, output for purposes of quick checking.
+    """
     filename = str(filename)
 
     poly = RegionPolygon
