@@ -194,7 +194,7 @@ def contours_to_FreeTernaryDiagram(
         poly = RegionPolygon
     else:
         poly = Poly
-        
+
     diagram = freeternary.FreeTernaryDiagram(
         tvar,
         lvar,
@@ -222,13 +222,14 @@ def contours_to_FreeTernaryDiagram(
             ] + suffix
             # might need to transform subpath here
             axis_to_data = ax.transData + ax.transTernaryAxes.inverted()
-            subpath = axis_to_data.transform(subpath.T)
+            subpath_transformed = axis_to_data.transform(subpath.T)
             c = poly(
-                subpath,
+                subpath_transformed * 100.0,  # scale for the ternary diagram
                 color=sty["color"],
                 name=str(name),
                 description=description_prefix,
                 mode="ternary",
+                labelpos=tuple(np.nanmean(subpath_transformed, axis=0)[:2]), # should update to a log-mean here
             )
             contours.append(c)
     diagram.extend(contours)

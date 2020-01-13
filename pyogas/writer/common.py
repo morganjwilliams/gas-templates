@@ -291,14 +291,18 @@ def Poly(
         name=name,
         visible=str(visible).lower(),
         closed=str(closed).lower(),
-        endArrow=str(endArrow).lower(),
+        endArrow=str(endArrow).lower(),  # not needed for ternary diagrams?
     )
 
     if color is not None:
         poly.append(get_color(color))
     poly.append(Element("LabelAngle", angle=str(labelangle)))
-    lx, ly = labelpos
-    poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
+    if mode is None:
+        lx, ly = labelpos
+        poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
+    elif mode == "ternary":
+        la, lb = labelpos
+        poly.append(Element("LabelPos", a=strfmt.format(la), b=strfmt.format(lb)))
     poly.append(pathcls(path, mode=mode))
     return poly
 
