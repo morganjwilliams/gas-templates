@@ -7,6 +7,8 @@ from pyrolite.util.text import int_to_alpha
 from pyrolite.util.plot import get_contour_paths
 from pyrolite.util.meta import subkwargs
 
+from pyrolite.util.plot import ABC_to_xy
+
 from ..util.xml import prettify_xml
 from .common import Poly, Polygon, RegionPolygon
 from . import freediagram
@@ -221,15 +223,18 @@ def contours_to_FreeTernaryDiagram(
                 name is None
             ] + suffix
             # might need to transform subpath here
-            axis_to_data = ax.transData + ax.transTernaryAxes.inverted()
-            subpath_transformed = axis_to_data.transform(subpath.T)
+            axis_to_data = ax.transData + ax.transTernaryAxes.inverted()  # 2D to 3D
+            subpath_ABC = axis_to_data.transform(subpath.T)
+            subpath_xy = ABC_to_xy(subpath_ABC[:, [2, 0, 1]], yscale=np.sqrt(3) / 2).T
             c = poly(
-                subpath_transformed * 100.0,  # scale for the ternary diagram
+                subpath_xy * 100.0,  # scale for the ternary diagram
                 color=sty["color"],
                 name=str(name),
                 description=description_prefix,
                 mode="ternary",
-                labelpos=tuple(np.nanmean(subpath_transformed, axis=0)[:2]), # should update to a log-mean here
+                labelpos=tuple(
+                    np.nanmean(subpath, axis=0)[:2]
+                ),  # should update to a log-mean here
             )
             contours.append(c)
     diagram.extend(contours)

@@ -257,10 +257,16 @@ def Boundary3(coords, sectionend=False, strfmt="{:.5f}", mode=None):
         for ix, s in enumerate(segs):
             s.append(BiezerPoint(xcoords[ix], ycoords[ix], strfmt=strfmt))
     elif mode == "ternary":
+        xcoords, ycoords = coords
+        segs = [Element("Linear") for (x, y) in zip(xcoords, ycoords)]
+        for ix, s in enumerate(segs):
+            s.append(BiezerPoint(xcoords[ix], ycoords[ix], strfmt=strfmt))
+        """
         t, l, r = coords.T
         segs = [Element("Linear") for (t, l) in zip(t, l)]
         for ix, s in enumerate(segs):
             s.append(BiezerPoint(t[ix], l[ix], strfmt=strfmt))
+        """
     else:
         return NotImplementedError
     boundary3.extend(segs)
