@@ -190,7 +190,11 @@ def contours_to_FreeTernaryDiagram(
     """
     filename = str(filename)
 
-    poly = RegionPolygon
+    if allow_free_func:
+        poly = RegionPolygon
+    else:
+        poly = Poly
+        
     diagram = freeternary.FreeTernaryDiagram(
         tvar,
         lvar,

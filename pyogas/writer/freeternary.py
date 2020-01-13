@@ -14,28 +14,28 @@ def TPoint(a, b, c=None, strfmt="{:.5f}"):
     return Element("TPoint", a=strfmt.format(a), b=strfmt.format(b))
 
 
-def FreeAxisA(name, log=False):
-    return Element("FreeAxisA", name=str(name))
+def FreeAxisA(name):
+    return Element("FreeAxisA", name=str(name), log=False)
 
 
-def FreeAxisB(name, log=False):
-    return Element("FreeAxisB", name=str(name))
+def FreeAxisB(name):
+    return Element("FreeAxisB", name=str(name), log=False)
 
 
-def FreeAxisC(name, log=False):
-    return Element("FreeAxisC", name=str(name))
+def FreeAxisC(name):
+    return Element("FreeAxisC", name=str(name), log=False)
 
 
 def FreeFunctionAxisA(name, function):
-    return Element("FreeFunctionAxisA", name=str(name), function=function)
+    return Element("FreeFunctionAxisA", name=str(name), function=function, log=False)
 
 
 def FreeFunctionAxisB(name, function):
-    return Element("FreeFunctionAxisB", name=str(name), function=function)
+    return Element("FreeFunctionAxisB", name=str(name), function=function, log=False)
 
 
 def FreeFunctionAxisC(name, function):
-    return Element("FreeFunctionAxisC", name=str(name), function=function)
+    return Element("FreeFunctionAxisC", name=str(name), function=function, log=False)
 
 
 def FreeTernaryDiagram(

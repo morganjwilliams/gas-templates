@@ -237,7 +237,7 @@ def BiezerPoint(x, y, sectionEnd=False, strfmt="{:.5f}"):
     )
 
 
-def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.5f}"):
+def Boundary3(coords, sectionend=False, strfmt="{:.5f}", mode=None):
     """
     Boundary defined by segments.
 
@@ -251,9 +251,18 @@ def Boundary3(xpoints, ypoints, sectionend=False, strfmt="{:.5f}"):
     :class:`lxml.etree.Element`
     """
     boundary3 = Element("Boundary3")
-    segs = [Element("Linear") for (x, y) in zip(xpoints, ypoints)]
-    for ix, s in enumerate(segs):
-        s.append(BiezerPoint(xpoints[ix], ypoints[ix], strfmt=strfmt))
+    if mode is None:
+        xcoords, ycoords = coords
+        segs = [Element("Linear") for (x, y) in zip(xcoords, ycoords)]
+        for ix, s in enumerate(segs):
+            s.append(BiezerPoint(xcoords[ix], ycoords[ix], strfmt=strfmt))
+    elif mode == "ternary":
+        t, l, r = coords.T
+        segs = [Element("Linear") for (t, l) in zip(t, l)]
+        for ix, s in enumerate(segs):
+            s.append(BiezerPoint(t[ix], l[ix], strfmt=strfmt))
+    else:
+        return NotImplementedError
     boundary3.extend(segs)
     return boundary3
 
@@ -270,6 +279,7 @@ def Poly(
     description=None,  # has no effect for Poly here
     strfmt="{:.5f}",
     pathcls=Boundary3,  # class of boundary
+    mode=None,
 ):
     """
     Returns
@@ -283,12 +293,13 @@ def Poly(
         closed=str(closed).lower(),
         endArrow=str(endArrow).lower(),
     )
+
     if color is not None:
         poly.append(get_color(color))
     poly.append(Element("LabelAngle", angle=str(labelangle)))
     lx, ly = labelpos
     poly.append(Element("LabelPos", x=strfmt.format(lx), y=strfmt.format(ly)))
-    poly.append(pathcls(path))
+    poly.append(pathcls(path, mode=mode))
     return poly
 
 
